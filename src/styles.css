@@ -1,0 +1,66 @@
+body {
+    background-color: #f8f9fa;
+    font-family: sans-serif;
+    overflow-x: hidden;
+    touch-action: manipulation;
+}
+
+.roulette-wrapper {
+    position: relative;
+    width: 92vw;
+    height: 92vw;
+    max-width: 450px;
+    max-height: 450px;
+    margin: 20px auto;
+}
+
+#wheel-svg {
+    width: 100%;
+    height: 100%;
+    transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.indicator {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-top: 35px solid #ff4d4d;
+    z-index: 20;
+}
+
+text {
+    font-weight: bold;
+    fill: #2f3542;
+    pointer-events: none;
+    dominant-baseline: central;
+}
+
+.btn-spin {
+    padding: 1.2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 50px;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.modal-content {
+    border-radius: 20px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: none;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.modal-footer {
+    border-top: none;
+}
