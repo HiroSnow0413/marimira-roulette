@@ -152,6 +152,7 @@ function spin() {
 
         document.getElementById('hit-item').innerText = selectedItem;
         document.getElementById('userName').value = '';
+        document.getElementById('userComment').value = '';
         resultModal.show();
     }, 5100);
 }
@@ -165,6 +166,7 @@ function handleSave() {
         alert('記録のためお名前を入力してください');
         return;
     }
+    const comment = document.getElementById('userComment').value.trim();
 
     resultModal.hide();
     document.getElementById('spin-btn').disabled = false;
@@ -178,6 +180,7 @@ function handleSave() {
             token: API_TOKEN,
             item: selectedItem,
             name,
+            comment,
             lat: currentLat,
             lng: currentLng,
         }),

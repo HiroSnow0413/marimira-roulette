@@ -46,7 +46,7 @@ function doGet() {
  *
  * リクエストボディ（Content-Type: text/plain で JSON 文字列を送る想定。
  * application/json だと CORS preflight が走り、GAS は OPTIONS に応答しないので失敗する）:
- *   { token, item, name, lat, lng }
+ *   { token, item, name, comment, lat, lng }   // comment は任意・最大120文字
  * レスポンス: { ok: true } | { error, message }
  */
 function doPost(e) {
@@ -74,25 +74,32 @@ function doPost(e) {
     return jsonResponse({ error: 'bad_request', message: 'item / name が必須です' });
   }
 
-  saveLog(item, name, lat, lng);
+  // コメント: 任意・最大 120 文字。超過分はサーバー側でも切り詰める。
+  const rawComment = typeof payload.comment === 'string' ? payload.comment : '';
+  const comment = rawComment.length > 120 ? rawComment.substring(0, 120) : rawComment;
+
+  saveLog(item, name, lat, lng, comment);
   return jsonResponse({ ok: true });
 }
 
 /**
  * 「ログ」シートへの実際の書き込み。シートが無ければ作成してヘッダー行も追加する。
+ * 既に 6 列ヘッダー（コメント列なし）のシートが存在する場合は G1 を補完する。
  */
-function saveLog(itemName, userName, lat, lng) {
+function saveLog(itemName, userName, lat, lng, comment) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let logSheet = ss.getSheetByName(SHEET_LOG);
   if (!logSheet) {
     logSheet = ss.insertSheet(SHEET_LOG);
-    logSheet.appendRow(['日付', '時間', '項目', '名前', '緯度', '経度']);
+    logSheet.appendRow(['日付', '時間', '項目', '名前', '緯度', '経度', 'コメント']);
+  } else if (logSheet.getRange(1, 7).getValue() === '') {
+    logSheet.getRange(1, 7).setValue('コメント');
   }
 
   const now = new Date();
   const date = Utilities.formatDate(now, 'JST', 'yyyy/MM/dd');
   const time = Utilities.formatDate(now, 'JST', 'HH:mm:ss');
-  logSheet.appendRow([date, time, itemName, userName, lat, lng]);
+  logSheet.appendRow([date, time, itemName, userName, lat, lng, comment]);
 }
 
 function jsonResponse(obj) {

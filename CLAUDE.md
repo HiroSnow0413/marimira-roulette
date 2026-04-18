@@ -30,10 +30,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### ファイル構成と責務
 
 - **[Code.gs](Code.gs)（GAS バックエンド）**:
-  - `doGet`（[Code.gs:28-43](Code.gs#L28-L43)）: 「ルーレット」シートから `{title, items}` を JSON で返す。
-  - `doPost(e)`（[Code.gs:53-77](Code.gs#L53-L77)）: `e.postData.contents` を JSON パース → トークン検証 → `saveLog` を呼ぶ。
-  - `saveLog`（[Code.gs:82-94](Code.gs#L82-L94)）: 「ログ」シートを遅延生成して JST で追記。
-  - `getApiToken`（[Code.gs:21-23](Code.gs#L21-L23)）: `PropertiesService.getScriptProperties()` から `API_TOKEN` を読む。未設定なら POST は全て拒否。
+  - `doGet`（[Code.gs:27-42](Code.gs#L27-L42)）: 「ルーレット」シートから `{title, items}` を JSON で返す。
+  - `doPost(e)`（[Code.gs:52-82](Code.gs#L52-L82)）: `e.postData.contents` を JSON パース → トークン検証 → `comment` を 120 字で切り詰めて `saveLog` を呼ぶ。
+  - `saveLog`（[Code.gs:88-104](Code.gs#L88-L104)）: 「ログ」シートを遅延生成して JST で追記。既存 6 列ヘッダーのシートには G1 に「コメント」を自動追加する後方互換処理あり。
+  - `getApiToken`（[Code.gs:19-21](Code.gs#L19-L21)）: `PropertiesService.getScriptProperties()` から `API_TOKEN` を読む。未設定なら POST は全て拒否。
 - **[index.html](index.html)（エントリー）**: 完全な静的 HTML。Bootstrap 5 と [src/styles.css](src/styles.css) / [src/script.js](src/script.js) を `<link>` / `<script src>` で参照するだけ。GAS スクリプトレット（`<?= ?>` / `<?!= ?>`）は一切無い。
 - **[src/styles.css](src/styles.css)**: ページ固有の CSS。
 - **[src/script.js](src/script.js)**: クライアント JS。冒頭に `API_URL` と `API_TOKEN` の 2 定数。
@@ -52,5 +52,5 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## スプレッドシート側の前提
 
 - シート名は固定で `ルーレット` と `ログ`。`ルーレット` が無いと [Code.gs:33](Code.gs#L33) で `{error: 'sheet_not_found'}` を返す。`ログ` は無ければ自動生成される。
-- ログ列の順序（日付, 時間, 項目, 名前, 緯度, 経度）も固定。順序を変えるなら [Code.gs](Code.gs) の `saveLog` と [README.md](README.md) 両方を更新する。
+- ログ列の順序（日付, 時間, 項目, 名前, 緯度, 経度, コメント）も固定。順序を変えるなら [Code.gs](Code.gs) の `saveLog` と [README.md](README.md) 両方を更新する。旧 6 列シートには G1 に「コメント」ヘッダーを初回書き込み時に自動追加する。
 - デプロイは「実行ユーザー: 自分 / アクセス: 全員」運用。再デプロイ時は**「デプロイを管理」から既存デプロイを更新**して URL を維持する（新規デプロイすると URL が変わりフロントの `API_URL` も差し替えが必要）。
