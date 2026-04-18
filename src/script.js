@@ -3,7 +3,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbwf3zdLLHwcpHh7ZDsuamkl__s8YCySxb8c-A2ZKdKw2G_tuHIceW9std9RVfALY8HkBg/exec';
 // 書き込み API の簡易認証トークン。Code.gs のスクリプトプロパティ API_TOKEN と一致させる。
 // 公開リポジトリに入れる性質上、完全な秘匿はできない（bot よけ程度）。
-const API_TOKEN = 'REPLACE_WITH_SECRET_TOKEN';
+const API_TOKEN = '1931c4ae649529b03a99e609841aa1f5';
 // =======================================================
 
 const SLICE_COLORS = ['#f783ac', '#ffcb00', '#ee5253', '#33bfff', '#1dd1a1', '#1e90ff', '#8e44ad', '#ff85a2'];
