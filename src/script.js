@@ -1,9 +1,6 @@
 // ========================= 設定 =========================
-// GAS ウェブアプリのエンドポイント（固定デプロイ URL）
+// GAS ウェブアプリのエンドポイント（項目取得のみに使用）
 const API_URL = 'https://script.google.com/macros/s/AKfycbwf3zdLLHwcpHh7ZDsuamkl__s8YCySxb8c-A2ZKdKw2G_tuHIceW9std9RVfALY8HkBg/exec';
-// 書き込み API の簡易認証トークン。Code.gs のスクリプトプロパティ API_TOKEN と一致させる。
-// 公開リポジトリに入れる性質上、完全な秘匿はできない（bot よけ程度）。
-const API_TOKEN = '1931c4ae649529b03a99e609841aa1f5';
 // =======================================================
 
 const SLICE_COLORS = ['#f783ac', '#ffcb00', '#ee5253', '#33bfff', '#1dd1a1', '#1e90ff', '#8e44ad', '#ff85a2'];
@@ -11,9 +8,20 @@ const SLICE_COLORS = ['#f783ac', '#ffcb00', '#ee5253', '#33bfff', '#1dd1a1', '#1
 let items = [];
 let currentRotation = 0;
 let selectedItem = '';
-let currentLat = '未取得';
-let currentLng = '未取得';
 let resultModal;
+let isSpinning = false;
+
+/**
+ * ボタン押下時刻（Date.now()）をシードにした PRNG。mulberry32。
+ */
+function mulberry32(seed) {
+    return function () {
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
 
 /**
  * 起動処理：GAS から項目を取得して SVG を描画する。
@@ -36,6 +44,8 @@ async function loadApp() {
 
         resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
         drawWheel();
+
+        document.querySelector('.roulette-wrapper').addEventListener('click', spin);
 
         if (items.length === 0) {
             spinBtn.textContent = '項目がありません';
@@ -111,37 +121,13 @@ function polarToCartesian(cx, cy, r, deg) {
     return { x: cx + (r * Math.cos(rad)), y: cy + (r * Math.sin(rad)) };
 }
 
-/**
- * 位置情報の事前取得（スピン中に実行）
- */
-function prefetchLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                currentLat = position.coords.latitude;
-                currentLng = position.coords.longitude;
-            },
-            (error) => {
-                console.warn('位置情報取得エラー:', error);
-                currentLat = '許可なし';
-                currentLng = '許可なし';
-            },
-            { enableHighAccuracy: true, timeout: 10000 }
-        );
-    } else {
-        currentLat = '非対応';
-        currentLng = '非対応';
-    }
-}
-
 function spin() {
-    if (items.length === 0) return;
+    if (items.length === 0 || isSpinning) return;
+    isSpinning = true;
     document.getElementById('spin-btn').disabled = true;
 
-    // スピン開始と同時にGPS取得を開始（初回許可の時間を稼ぐ）
-    prefetchLocation();
-
-    const extra = Math.floor(Math.random() * 360);
+    const rand = mulberry32(Date.now());
+    const extra = Math.floor(rand() * 360);
     currentRotation += (360 * 10) + extra;
     document.getElementById('wheel-svg').style.transform = `rotate(${currentRotation}deg)`;
 
@@ -151,45 +137,18 @@ function spin() {
         selectedItem = items[idx];
 
         document.getElementById('hit-item').innerText = selectedItem;
-        document.getElementById('userName').value = '';
-        document.getElementById('userComment').value = '';
         resultModal.show();
+        isSpinning = false;
     }, 5100);
 }
 
-/**
- * ログ保存（楽観的UI：即座に閉じて fetch は fire-and-forget）
- */
-function handleSave() {
-    const name = document.getElementById('userName').value.trim();
-    if (!name) {
-        alert('記録のためお名前を入力してください');
-        return;
-    }
-    const comment = document.getElementById('userComment').value.trim();
-
+function closeModal() {
     resultModal.hide();
     document.getElementById('spin-btn').disabled = false;
-
-    // GAS は CORS preflight (OPTIONS) に応答しない。Content-Type を text/plain にすると
-    // "simple request" 扱いになり preflight が飛ばないため POST が通る。
-    fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-            token: API_TOKEN,
-            item: selectedItem,
-            name,
-            comment,
-            lat: currentLat,
-            lng: currentLng,
-        }),
-    }).catch(err => console.error('保存失敗:', err));
 }
 
 function closeAndSpin() {
-    resultModal.hide();
-    document.getElementById('spin-btn').disabled = false;
+    closeModal();
     spin();
 }
 

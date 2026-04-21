@@ -32,23 +32,11 @@
                 <div class="modal-header bg-warning text-dark">
                     <h5 class="modal-title fw-bold">当たり！：<span id="hit-item"></span></h5>
                 </div>
-                <div class="modal-body py-4 text-start">
-                    <div class="mb-3">
-                        <label for="userName" class="form-label fw-bold">お名前を入力してください：</label>
-                        <input type="text" id="userName" class="form-control form-control-lg" placeholder="例：マリミラ太郎"
-                            autocomplete="off">
-                    </div>
-                    <div class="mb-3">
-                        <label for="userComment" class="form-label fw-bold">コメント（任意・120文字以内）：</label>
-                        <input type="text" id="userComment" class="form-control form-control-lg" maxlength="120"
-                            placeholder="どのメンバー希望など" autocomplete="off">
-                    </div>
-                </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill"
-                        onclick="closeAndSpin()">もう一度回す</button>
+                        onclick="closeModal()">閉じる</button>
                     <button type="button" class="btn btn-primary px-4 py-2 rounded-pill fw-bold"
-                        onclick="handleSave()">保存して終了</button>
+                        onclick="closeAndSpin()">もう一度回す</button>
                 </div>
             </div>
         </div>
