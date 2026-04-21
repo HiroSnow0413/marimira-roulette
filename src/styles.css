@@ -65,3 +65,11 @@ text {
 .modal-footer {
     border-top: none;
 }
+
+.hit-item-display {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #3385ff;
+    word-break: break-word;
+    padding: 0.5rem 0;
+}
