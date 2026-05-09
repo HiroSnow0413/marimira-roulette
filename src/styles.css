@@ -19,8 +19,8 @@ body {
 }
 
 .notice svg {
-    width: 1.1em;
-    height: 1.1em;
+    width: 1em;
+    height: 1em;
     color: #ff8c00;
     flex-shrink: 0;
 }
