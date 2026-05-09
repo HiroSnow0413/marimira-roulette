@@ -5,6 +5,26 @@ body {
     touch-action: manipulation;
 }
 
+.notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #fff3cd;
+    color: #664d03;
+    border: 1px solid #ffe69c;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.notice svg {
+    width: 1.1em;
+    height: 1.1em;
+    color: #ff8c00;
+    flex-shrink: 0;
+}
+
 .roulette-wrapper {
     position: relative;
     width: 92vw;
